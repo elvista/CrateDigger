@@ -1,5 +1,6 @@
 import asyncio
 import json
+from collections import deque
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends
@@ -13,30 +14,12 @@ router = APIRouter(tags=["monitor"])
 
 monitor_service = MonitorService()
 
-# In-memory store for notifications
-notifications: list[dict] = []
+# Bounded notification store (max 200 entries)
+notifications: deque[dict] = deque(maxlen=200)
 
 
-@router.post("/monitor/check-all")
-def check_all_playlists(db: Session = Depends(get_db)):
-    results = monitor_service.check_all(db)
-    # Store notifications for any changes found
-    for r in results:
-        if r.get("added", 0) > 0 or r.get("removed", 0) > 0:
-            notifications.append({
-                "type": "playlist_changed",
-                "playlist_name": r.get("playlist_name", ""),
-                "playlist_id": r.get("playlist_id"),
-                "added": r.get("added", 0),
-                "removed": r.get("removed", 0),
-                "timestamp": datetime.now(timezone.utc).isoformat(),
-            })
-    return {"detail": "Check complete", "results": results}
-
-
-@router.post("/monitor/check/{playlist_id}")
-def check_playlist(playlist_id: int, db: Session = Depends(get_db)):
-    result = monitor_service.check_one(playlist_id, db)
+def _add_notification(result: dict):
+    """Add a notification if changes were detected."""
     if result.get("added", 0) > 0 or result.get("removed", 0) > 0:
         notifications.append({
             "type": "playlist_changed",
@@ -46,6 +29,20 @@ def check_playlist(playlist_id: int, db: Session = Depends(get_db)):
             "removed": result.get("removed", 0),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         })
+
+
+@router.post("/monitor/check-all")
+def check_all_playlists(db: Session = Depends(get_db)):
+    results = monitor_service.check_all(db)
+    for r in results:
+        _add_notification(r)
+    return {"detail": "Check complete", "results": results}
+
+
+@router.post("/monitor/check/{playlist_id}")
+def check_playlist(playlist_id: int, db: Session = Depends(get_db)):
+    result = monitor_service.check_one(playlist_id, db)
+    _add_notification(result)
     return result
 
 
@@ -59,11 +56,11 @@ async def notification_stream():
         while True:
             current_count = len(notifications)
             if current_count > last_count:
-                new_notifications = notifications[last_count:]
+                new_items = list(notifications)[last_count:]
                 last_count = current_count
                 yield {
                     "event": "notification",
-                    "data": json.dumps(new_notifications),
+                    "data": json.dumps(new_items),
                 }
             await asyncio.sleep(2)
 

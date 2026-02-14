@@ -1,7 +1,19 @@
+import asyncio
 import re
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 from config import settings
+
+
+# Module-level singleton
+_instance = None
+
+
+def get_spotify_service():
+    global _instance
+    if _instance is None:
+        _instance = SpotifyService()
+    return _instance
 
 
 class SpotifyService:
@@ -23,7 +35,8 @@ class SpotifyService:
             self._sp = spotipy.Spotify(auth_manager=auth_manager)
         return self._sp
 
-    def extract_playlist_id(self, url: str) -> str | None:
+    @staticmethod
+    def extract_playlist_id(url: str) -> str | None:
         patterns = [
             r"spotify\.com/playlist/([a-zA-Z0-9]+)",
             r"spotify:playlist:([a-zA-Z0-9]+)",
@@ -34,7 +47,8 @@ class SpotifyService:
                 return match.group(1)
         return None
 
-    def get_playlist(self, playlist_id: str) -> dict | None:
+    def _get_playlist_sync(self, playlist_id: str) -> dict | None:
+        """Synchronous Spotify API call (runs in thread pool)."""
         try:
             result = self.sp.playlist(playlist_id)
         except Exception:
@@ -43,7 +57,6 @@ class SpotifyService:
         tracks = []
         items = result["tracks"]["items"]
 
-        # Handle pagination
         while True:
             for item in items:
                 track = item.get("track")
@@ -79,3 +92,11 @@ class SpotifyService:
             "spotify_url": result["external_urls"].get("spotify", ""),
             "tracks": tracks,
         }
+
+    async def get_playlist(self, playlist_id: str) -> dict | None:
+        """Non-blocking: runs Spotify API calls in a thread pool."""
+        return await asyncio.to_thread(self._get_playlist_sync, playlist_id)
+
+    def get_playlist_sync(self, playlist_id: str) -> dict | None:
+        """Blocking version for use in sync contexts (e.g. APScheduler)."""
+        return self._get_playlist_sync(playlist_id)

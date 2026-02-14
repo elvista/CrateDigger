@@ -5,6 +5,13 @@ export function useSSE(url, enabled = true) {
   const [error, setError] = useState(null);
   const [connected, setConnected] = useState(false);
   const eventSourceRef = useRef(null);
+  const retryTimeoutRef = useRef(null);
+  const enabledRef = useRef(enabled);
+
+  // Keep ref in sync so retry callback reads latest value
+  useEffect(() => {
+    enabledRef.current = enabled;
+  }, [enabled]);
 
   const connect = useCallback(() => {
     if (eventSourceRef.current) {
@@ -29,31 +36,28 @@ export function useSSE(url, enabled = true) {
       setConnected(false);
       setError('Connection lost');
       es.close();
-      // Retry after 5 seconds
-      setTimeout(() => {
-        if (enabled) connect();
+      // Retry after 5 seconds, reading latest enabled from ref
+      retryTimeoutRef.current = setTimeout(() => {
+        if (enabledRef.current) connect();
       }, 5000);
     };
-  }, [url, enabled]);
+  }, [url]);
 
   useEffect(() => {
     if (enabled) {
       connect();
     }
     return () => {
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+        retryTimeoutRef.current = null;
+      }
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
+        eventSourceRef.current = null;
       }
     };
   }, [connect, enabled]);
 
-  const disconnect = useCallback(() => {
-    if (eventSourceRef.current) {
-      eventSourceRef.current.close();
-      eventSourceRef.current = null;
-      setConnected(false);
-    }
-  }, []);
-
-  return { data, error, connected, disconnect };
+  return { data, error, connected };
 }

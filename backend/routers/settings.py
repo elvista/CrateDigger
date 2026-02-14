@@ -7,11 +7,9 @@ from sqlalchemy.orm import Session
 
 from database import get_db
 from models import AppSetting
-from config import settings as default_settings
+from config import DEFAULT_DOWNLOAD_PATH, settings as app_config
 
 router = APIRouter(tags=["settings"])
-
-DEFAULT_DOWNLOAD_PATH = str(Path.home() / "Music" / "SpotDownload")
 
 
 def get_setting(db: Session, key: str, default: str = "") -> str:
@@ -50,7 +48,7 @@ def get_settings(db: Session = Depends(get_db)):
     download_path = get_setting(db, "download_path", DEFAULT_DOWNLOAD_PATH)
     monitor_interval = get_setting(
         db, "monitor_interval_minutes",
-        str(default_settings.MONITOR_INTERVAL_MINUTES),
+        str(app_config.MONITOR_INTERVAL_MINUTES),
     )
     return SettingsResponse(
         download_path=download_path,
@@ -61,9 +59,7 @@ def get_settings(db: Session = Depends(get_db)):
 @router.put("/settings", response_model=SettingsResponse)
 def update_settings(body: UpdateSettingsRequest, db: Session = Depends(get_db)):
     if body.download_path is not None:
-        # Expand ~ and resolve
         resolved = str(Path(body.download_path).expanduser().resolve())
-        # Create directory if it doesn't exist
         os.makedirs(resolved, exist_ok=True)
         set_setting(db, "download_path", resolved)
 
@@ -77,7 +73,6 @@ def update_settings(body: UpdateSettingsRequest, db: Session = Depends(get_db)):
 
 @router.post("/settings/validate-path", response_model=ValidatePathResponse)
 def validate_path(body: UpdateSettingsRequest, db: Session = Depends(get_db)):
-    """Check if a path exists and is writable, optionally create it."""
     raw_path = body.download_path or DEFAULT_DOWNLOAD_PATH
     resolved = str(Path(raw_path).expanduser().resolve())
 

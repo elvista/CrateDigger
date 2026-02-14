@@ -36,7 +36,6 @@ def scheduled_check():
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     init_db()
     scheduler.add_job(
         scheduled_check,
@@ -50,7 +49,6 @@ async def lifespan(app: FastAPI):
         f"Background monitor started (every {app_config.MONITOR_INTERVAL_MINUTES} min)"
     )
     yield
-    # Shutdown
     scheduler.shutdown()
 
 

@@ -1,35 +1,16 @@
 import asyncio
 import os
 import logging
-from pathlib import Path
-
-from database import SessionLocal
-from models import AppSetting
 
 logger = logging.getLogger("spotdownload.downloader")
-
-DEFAULT_DOWNLOAD_PATH = str(Path.home() / "Music" / "SpotDownload")
-
-
-def get_download_path() -> str:
-    """Read download path from DB settings, fall back to default."""
-    db = SessionLocal()
-    try:
-        row = db.query(AppSetting).filter(AppSetting.key == "download_path").first()
-        path = row.value if row else DEFAULT_DOWNLOAD_PATH
-    finally:
-        db.close()
-    os.makedirs(path, exist_ok=True)
-    return path
 
 
 class DownloaderService:
     async def download_track(
-        self, name: str, artist: str, spotify_url: str = ""
+        self, name: str, artist: str, download_path: str, spotify_url: str = ""
     ) -> bool:
         """Download a single track using yt-dlp by searching YouTube."""
         search_query = f"{artist} - {name}"
-        download_path = get_download_path()
         output_template = os.path.join(download_path, "%(title)s.%(ext)s")
 
         try:

@@ -5,11 +5,13 @@ from dotenv import load_dotenv
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
+DEFAULT_DOWNLOAD_PATH = str(Path.home() / "Music" / "SpotDownload")
+
 
 class Settings(BaseSettings):
     SPOTIFY_CLIENT_ID: str = ""
     SPOTIFY_CLIENT_SECRET: str = ""
-    DOWNLOAD_PATH: str = str(Path.home() / "Music" / "SpotDownload")
+    DOWNLOAD_PATH: str = DEFAULT_DOWNLOAD_PATH
     DATABASE_URL: str = "sqlite:///./spotdownload.db"
     MONITOR_INTERVAL_MINUTES: int = 30
 

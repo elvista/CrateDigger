@@ -1,16 +1,8 @@
-function timeAgo(dateStr) {
-  if (!dateStr) return 'Never';
-  const date = new Date(dateStr);
-  const now = new Date();
-  const seconds = Math.floor((now - date) / 1000);
+import React from 'react';
+import { timeAgo } from '../utils/format';
+import { RefreshIcon, MusicIcon } from './Icons';
 
-  if (seconds < 60) return 'Just now';
-  if (seconds < 3600) return `${Math.floor(seconds / 60)}m ago`;
-  if (seconds < 86400) return `${Math.floor(seconds / 3600)}h ago`;
-  return `${Math.floor(seconds / 86400)}d ago`;
-}
-
-export default function PlaylistMonitor({ playlists, onSelect, onCheckAll, selectedId, checking }) {
+export default React.memo(function PlaylistMonitor({ playlists, onSelect, onCheckAll, selectedId, checking }) {
   if (!playlists || playlists.length === 0) return null;
 
   return (
@@ -22,9 +14,7 @@ export default function PlaylistMonitor({ playlists, onSelect, onCheckAll, selec
           disabled={checking}
           className="text-sm text-spotify-green hover:text-spotify-green-dark transition-colors flex items-center gap-1.5 disabled:opacity-50"
         >
-          <svg className={`w-4 h-4 ${checking ? 'animate-spin' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
-          </svg>
+          <RefreshIcon className="w-4 h-4" spinning={checking} />
           {checking ? 'Checking...' : 'Check All'}
         </button>
       </div>
@@ -49,9 +39,7 @@ export default function PlaylistMonitor({ playlists, onSelect, onCheckAll, selec
                   <img src={pl.image_url} alt={pl.name} className="w-12 h-12 rounded-lg object-cover flex-shrink-0" />
                 ) : (
                   <div className="w-12 h-12 rounded-lg bg-spotify-mid-gray flex items-center justify-center flex-shrink-0">
-                    <svg className="w-6 h-6 text-spotify-light-gray" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-                    </svg>
+                    <MusicIcon className="w-6 h-6 text-spotify-light-gray" />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
@@ -75,4 +63,4 @@ export default function PlaylistMonitor({ playlists, onSelect, onCheckAll, selec
       </div>
     </div>
   );
-}
+});

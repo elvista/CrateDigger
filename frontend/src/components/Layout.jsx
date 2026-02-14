@@ -1,4 +1,6 @@
-export default function Layout({ children, onOpenSettings }) {
+import React from 'react';
+
+export default React.memo(function Layout({ children, onOpenSettings }) {
   return (
     <div className="min-h-screen bg-spotify-black">
       {/* Header */}
@@ -41,4 +43,4 @@ export default function Layout({ children, onOpenSettings }) {
       </main>
     </div>
   );
-}
+});

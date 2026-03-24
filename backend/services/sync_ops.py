@@ -7,15 +7,29 @@ from sqlalchemy.orm import Session
 from models import Playlist, Track
 
 
+def dedupe_spotify_tracks(tracks: list[dict]) -> list[dict]:
+    """Spotify may return the same track id twice in one playlist; DB enforces one row per id."""
+    seen: set[str] = set()
+    out: list[dict] = []
+    for t in tracks:
+        tid = t["id"]
+        if tid in seen:
+            continue
+        seen.add(tid)
+        out.append(t)
+    return out
+
+
 def refresh_playlist_tracks(playlist: Playlist, spotify_data: dict, db: Session) -> dict:
     """
     Compare Spotify data against stored tracks.
     Adds new tracks, removes deleted ones, returns change summary.
     """
+    tracks = dedupe_spotify_tracks(spotify_data["tracks"])
     existing_ids = {t.spotify_id for t in playlist.tracks}
-    new_track_ids = {t["id"] for t in spotify_data["tracks"]}
+    new_track_ids = {t["id"] for t in tracks}
 
-    added = [t for t in spotify_data["tracks"] if t["id"] not in existing_ids]
+    added = [t for t in tracks if t["id"] not in existing_ids]
     removed_ids = existing_ids - new_track_ids
 
     # Update playlist metadata
@@ -23,7 +37,7 @@ def refresh_playlist_tracks(playlist: Playlist, spotify_data: dict, db: Session)
     playlist.description = spotify_data.get("description", "")
     playlist.owner = spotify_data["owner"]
     playlist.image_url = spotify_data.get("image_url", "")
-    playlist.track_count = len(spotify_data["tracks"])
+    playlist.track_count = len(tracks)
     playlist.last_checked = datetime.now(UTC)
 
     # Mark all existing tracks as not new
@@ -58,5 +72,5 @@ def refresh_playlist_tracks(playlist: Playlist, spotify_data: dict, db: Session)
         "playlist_name": playlist.name,
         "added": len(added),
         "removed": len(removed_ids),
-        "total": len(spotify_data["tracks"]),
+        "total": len(tracks),
     }

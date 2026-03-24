@@ -10,7 +10,7 @@ from database import get_db
 from models import Playlist, Track
 from routers.auth import get_setting, set_setting
 from services.spotify import SpotifyAuthError, get_spotify_service
-from services.sync_ops import refresh_playlist_tracks
+from services.sync_ops import dedupe_spotify_tracks, refresh_playlist_tracks
 
 router = APIRouter(tags=["playlists"])
 
@@ -114,20 +114,21 @@ async def add_playlist(body: PlaylistCreate, db: Session = Depends(get_db)):
     if not data:
         raise HTTPException(status_code=404, detail="Playlist not found on Spotify")
 
+    track_rows = dedupe_spotify_tracks(data["tracks"])
     playlist = Playlist(
         spotify_id=data["id"],
         name=data["name"],
         description=data.get("description", ""),
         owner=data["owner"],
         image_url=data.get("image_url", ""),
-        track_count=len(data["tracks"]),
+        track_count=len(track_rows),
         spotify_url=data.get("spotify_url", ""),
         last_checked=datetime.now(UTC),
     )
     db.add(playlist)
     db.flush()
 
-    for t in data["tracks"]:
+    for t in track_rows:
         track = Track(
             playlist_id=playlist.id,
             spotify_id=t["id"],

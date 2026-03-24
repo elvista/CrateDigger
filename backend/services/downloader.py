@@ -4,12 +4,23 @@ import asyncio
 import logging
 import os
 import re
+import tempfile
 import urllib.request
+from dataclasses import dataclass
 
 from mutagen.id3 import APIC, ID3, TALB, TCON, TIT2, TPE1
 from mutagen.mp3 import MP3
 
 logger = logging.getLogger("spotdownload.downloader")
+
+
+@dataclass(frozen=True)
+class DownloadResult:
+    """Result of a yt-dlp download; audio is matched from YouTube, not Spotify."""
+
+    ok: bool
+    source_url: str = ""
+    source_title: str = ""
 
 
 def _sanitize_filename(s: str) -> str:
@@ -114,17 +125,34 @@ class DownloaderService:
         image_url: str = "",
         genre: str = "",
         track_id: int | None = None,
-    ) -> bool:
+    ) -> DownloadResult:
         """Download a single track using yt-dlp, then set ID3 tags from Spotify and rename."""
         search_query = f"{artist} - {name}"
         tid = track_id if track_id is not None else id(self)
         output_template = os.path.join(download_path, f"track_{tid}.%(ext)s")
         expected_mp3 = os.path.join(download_path, f"track_{tid}.mp3")
+        path_u: str | None = None
+        path_t: str | None = None
 
         try:
+            fd_u, path_u = tempfile.mkstemp(
+                suffix=".txt", prefix=f"ytdlp_{tid}_url_", dir=download_path
+            )
+            fd_t, path_t = tempfile.mkstemp(
+                suffix=".txt", prefix=f"ytdlp_{tid}_title_", dir=download_path
+            )
+            os.close(fd_u)
+            os.close(fd_t)
+
             process = await asyncio.create_subprocess_exec(
                 "yt-dlp",
                 f"ytsearch1:{search_query}",
+                "--print-to-file",
+                "%(webpage_url)s",
+                path_u,
+                "--print-to-file",
+                "%(title)s",
+                path_t,
                 "--extract-audio",
                 "--audio-format",
                 "mp3",
@@ -133,7 +161,7 @@ class DownloaderService:
                 "--output",
                 output_template,
                 "--no-playlist",
-                "--quiet",
+                "--no-progress",
                 "--no-warnings",
                 "--embed-thumbnail",
                 "--add-metadata",
@@ -142,14 +170,32 @@ class DownloaderService:
             )
             stdout, stderr = await process.communicate()
 
+            source_url = ""
+            source_title = ""
+            try:
+                if os.path.isfile(path_u):
+                    with open(path_u, encoding="utf-8", errors="replace") as f:
+                        source_url = f.read().strip()
+                if os.path.isfile(path_t):
+                    with open(path_t, encoding="utf-8", errors="replace") as f:
+                        source_title = f.read().strip()
+            finally:
+                for p in (path_u, path_t):
+                    if p:
+                        try:
+                            os.remove(p)
+                        except OSError:
+                            pass
+                path_u = path_t = None
+
             if process.returncode != 0:
                 err_msg = stderr.decode().strip() if stderr else "Unknown error"
                 logger.error(f"Failed to download '{search_query}': {err_msg}")
-                return False
+                return DownloadResult(False)
 
             if not os.path.isfile(expected_mp3):
                 logger.error(f"Expected file missing after yt-dlp: {expected_mp3}")
-                return False
+                return DownloadResult(False)
 
             if os.path.getsize(expected_mp3) <= 0:
                 logger.error(f"Downloaded file is empty: {expected_mp3}")
@@ -157,7 +203,7 @@ class DownloaderService:
                     os.remove(expected_mp3)
                 except OSError:
                     pass
-                return False
+                return DownloadResult(False)
 
             # Set ID3 tags from Spotify in thread (blocking: file I/O + cover fetch)
             try:
@@ -178,10 +224,21 @@ class DownloaderService:
                 logger.warning(f"Rename failed, leaving as {expected_mp3}: {e}")
 
             logger.info(f"Downloaded: {search_query} -> {download_path}")
-            return True
+            return DownloadResult(True, source_url=source_url, source_title=source_title)
 
         except FileNotFoundError:
             raise RuntimeError("yt-dlp not found. Install it with: pip install yt-dlp")
         except Exception as e:
             logger.error(f"Download error for '{search_query}': {e}")
             raise RuntimeError(f"Download failed: {e}")
+        finally:
+            if path_u:
+                try:
+                    os.remove(path_u)
+                except OSError:
+                    pass
+            if path_t:
+                try:
+                    os.remove(path_t)
+                except OSError:
+                    pass

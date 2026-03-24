@@ -120,6 +120,13 @@ export default React.memo(function SettingsModal({ isOpen, onClose }) {
 
         {/* Body */}
         <div className="p-6 space-y-6">
+          <div className="p-3 rounded-xl bg-spotify-mid-gray/40 border border-white/10">
+            <p className="text-xs text-spotify-light-gray leading-relaxed">
+              Downloads use YouTube to find audio for each track; Spotify supplies playlist data and tags only. Matches
+              are best-effort. Using Spotify and YouTube is subject to their terms—respect applicable copyright.
+            </p>
+          </div>
+
           {/* Spotify Connection */}
           <div>
             <label className="block text-sm font-medium text-white mb-2">Spotify Connection</label>

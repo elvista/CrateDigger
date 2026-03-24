@@ -222,12 +222,14 @@ async def _download_one(t: dict, download_path: str, sem: asyncio.Semaphore):
         "artist": t["artist"],
         "status": "downloading",
         "progress": 0,
+        "source_url": "",
+        "source_title": "",
     }
     _progress_order.append(track_id)
 
     async with sem:
         try:
-            success = await downloader.download_track(
+            result = await downloader.download_track(
                 name=t["name"],
                 artist=t["artist"],
                 album=t.get("album", "") or "",
@@ -237,6 +239,10 @@ async def _download_one(t: dict, download_path: str, sem: asyncio.Semaphore):
                 download_path=download_path,
                 spotify_url=t["spotify_url"],
             )
+            success = result.ok
+            if success:
+                download_progress[track_id]["source_url"] = result.source_url or ""
+                download_progress[track_id]["source_title"] = result.source_title or ""
             download_progress[track_id]["status"] = "completed" if success else "failed"
             download_progress[track_id]["progress"] = 100 if success else 0
             return t["id"] if success else None

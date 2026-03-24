@@ -2,7 +2,7 @@ import React from 'react';
 
 export default React.memo(function Layout({ children, onOpenSettings, onGoHome }) {
   return (
-    <div className="min-h-screen bg-spotify-black">
+    <div className="min-h-screen bg-spotify-black flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-spotify-black/95 backdrop-blur-sm border-b border-white/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -58,9 +58,19 @@ export default React.memo(function Layout({ children, onOpenSettings, onGoHome }
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1">
         {children}
       </main>
+
+      <footer className="border-t border-white/5 mt-auto py-6 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-7xl mx-auto">
+          <p className="text-xs text-spotify-light-gray/90 leading-relaxed max-w-3xl">
+            Playlists and track info come from Spotify. Audio files are found and downloaded via YouTube search—match
+            quality varies and may not be the same recording as on Spotify. Use of Spotify and YouTube is subject to
+            their terms; respect applicable copyright.
+          </p>
+        </div>
+      </footer>
     </div>
   );
 });

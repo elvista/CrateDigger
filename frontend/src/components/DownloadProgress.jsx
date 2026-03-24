@@ -44,6 +44,27 @@ export default React.memo(function DownloadProgress({ downloads, onClear }) {
               <div className="min-w-0 flex-1">
                 <p className="text-sm text-white truncate">{dl.name}</p>
                 <p className="text-xs text-spotify-light-gray truncate">{dl.artist}</p>
+                {dl.status === 'completed' && (
+                  <div className="mt-1 text-xs text-spotify-light-gray/90">
+                    <span className="text-spotify-light-gray">Matched from YouTube</span>
+                    {dl.source_title ? (
+                      <span className="text-spotify-light-gray/80"> — {dl.source_title}</span>
+                    ) : null}
+                    {dl.source_url ? (
+                      <>
+                        {' '}
+                        <a
+                          href={dl.source_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-spotify-green hover:underline"
+                        >
+                          Open source
+                        </a>
+                      </>
+                    ) : null}
+                  </div>
+                )}
               </div>
               <span className={`text-xs font-medium ${dl.status === 'failed' ? 'text-red-400' : 'text-spotify-green'}`}>
                 {dl.status === 'downloading' ? 'Downloading...' : dl.status === 'completed' ? 'Done' : 'Failed'}

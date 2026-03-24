@@ -175,6 +175,55 @@ def test_add_playlist_success(client, db_session: Session):
     assert data["tracks"][0]["genre"] == "Pop"
 
 
+def test_add_playlist_dedupes_duplicate_spotify_track_ids(client, db_session: Session):
+    """Spotify can list the same track twice; we store one row per spotify_id (UNIQUE)."""
+    dup_id = "same_track_twice"
+    fake_playlist_data = {
+        "id": "pl_dup",
+        "name": "Dupes",
+        "description": "",
+        "owner": "u",
+        "image_url": "",
+        "spotify_url": "",
+        "tracks": [
+            {
+                "id": dup_id,
+                "name": "Song",
+                "artist": "A",
+                "album": "",
+                "genre": "",
+                "duration_ms": 1000,
+                "image_url": "",
+                "spotify_url": "",
+            },
+            {
+                "id": dup_id,
+                "name": "Song",
+                "artist": "A",
+                "album": "",
+                "genre": "",
+                "duration_ms": 1000,
+                "image_url": "",
+                "spotify_url": "",
+            },
+        ],
+    }
+
+    class FakeSpotify:
+        @staticmethod
+        def extract_playlist_id(url: str):
+            return "pl_dup"
+
+        async def get_playlist(self, playlist_id: str):
+            return fake_playlist_data
+
+    with patch("routers.playlists.get_spotify_service", return_value=FakeSpotify()):
+        r = client.post("/api/playlists", json={"url": "https://open.spotify.com/playlist/pl_dup"})
+    assert r.status_code == 200
+    assert r.json()["track_count"] == 1
+    assert len(r.json()["tracks"]) == 1
+
+
 def test_add_playlist_already_exists(client, db_session: Session):
     """POST /api/playlists with already-added playlist returns 409."""
     pl = Playlist(spotify_id="existing_id", name="Existing", track_count=0)

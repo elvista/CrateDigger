@@ -18,7 +18,7 @@ import httpx
 
 from config import settings as app_settings
 
-logger = logging.getLogger("spotdownload.fingerprinter")
+logger = logging.getLogger("cratedigger.fingerprinter")
 
 ACR_SKIP_AUDD_MIN_RAW_SCORE = 0.8
 

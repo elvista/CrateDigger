@@ -17,7 +17,7 @@ from dataclasses import dataclass
 from mutagen.id3 import APIC, ID3, TALB, TCON, TIT2, TPE1
 from mutagen.mp3 import MP3
 
-logger = logging.getLogger("spotdownload.downloader")
+logger = logging.getLogger("cratedigger.downloader")
 
 
 @dataclass(frozen=True)
@@ -62,7 +62,7 @@ def _fetch_cover_bytes(image_url: str) -> bytes | None:
     if not image_url or not image_url.startswith("http"):
         return None
     try:
-        req = urllib.request.Request(image_url, headers={"User-Agent": "SpotDownload/1.0"})
+        req = urllib.request.Request(image_url, headers={"User-Agent": "CrateDigger/1.0"})
         with urllib.request.urlopen(req, timeout=10) as resp:
             return resp.read()
     except Exception as e:

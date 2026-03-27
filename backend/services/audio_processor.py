@@ -10,7 +10,7 @@ import shutil
 import time
 from pathlib import Path
 
-logger = logging.getLogger("spotdownload.audio_processor")
+logger = logging.getLogger("cratedigger.audio_processor")
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 TEMP_DIR = BACKEND_ROOT / "temp"

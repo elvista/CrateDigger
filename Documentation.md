@@ -1,6 +1,6 @@
-# Music Studio — product notes
+# CrateDigger — product notes
 
-**Music Studio** (repo name often **SpotDownload**) is a self-hosted app that combines:
+**CrateDigger** is a self-hosted app that combines:
 
 1. **Spotify ID** — Track Spotify playlists, diff new tracks, download audio locally using **yt-dlp** and **ffmpeg**, with metadata from Spotify.
 2. **Mixtape ID** — Analyze long mixes (file or streaming URL), fingerprint samples via **ACRCloud** / **AudD**, produce a timestamped list, and optionally push tracks through the same download path or to a Spotify playlist.

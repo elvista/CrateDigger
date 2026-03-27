@@ -1,4 +1,4 @@
-"""Pytest fixtures for SpotDownload API tests."""
+"""Pytest fixtures for CrateDigger API tests."""
 
 import os
 from collections.abc import Generator
@@ -13,7 +13,7 @@ import models  # noqa: F401 - register models with Base
 from database import Base, get_db
 
 # Set test DB before importing app (so scheduler uses test DB if it runs)
-TEST_DB_URL = "sqlite:///./test_spotdownload.db"
+TEST_DB_URL = "sqlite:///./test_cratedigger.db"
 os.environ.setdefault("DATABASE_URL", TEST_DB_URL)
 
 from main import app  # noqa: E402
@@ -42,7 +42,7 @@ def setup_test_db():
     yield
     Base.metadata.drop_all(bind=test_engine)
     try:
-        os.remove("./test_spotdownload.db")
+        os.remove("./test_cratedigger.db")
     except OSError:
         pass
 

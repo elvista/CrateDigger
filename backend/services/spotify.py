@@ -11,7 +11,7 @@ from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponen
 
 from config import settings
 
-logger = logging.getLogger("spotdownload.spotify")
+logger = logging.getLogger("cratedigger.spotify")
 
 try:
     from spotipy.exceptions import SpotifyException
@@ -246,7 +246,7 @@ class SpotifyService:
                 user_id,
                 archive_name,
                 public=False,
-                description="Archive for downloaded tracks from SpotDownload",
+                description="Archive for downloaded tracks from CrateDigger",
             )
             return new_playlist["id"]
 

@@ -21,7 +21,7 @@ TOKEN_KEYS = ("spotify_access_token", "spotify_refresh_token")
 SPOTIFY_REDIRECT_URI_EXACT = "http://127.0.0.1:8000/api/auth/spotify/callback"
 
 router = APIRouter(tags=["auth"])
-logger = logging.getLogger("spotdownload.auth")
+logger = logging.getLogger("cratedigger.auth")
 
 SCOPES = [
     "playlist-modify-public",

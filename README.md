@@ -1,4 +1,4 @@
-# Music Studio
+# CrateDigger
 Vibecoded by Elius (https://hmelius.com)
 
 Self-hosted web app with two areas in one React shell:

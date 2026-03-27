@@ -1,4 +1,4 @@
-# Contributing to Music Studio (SpotDownload)
+# Contributing to CrateDigger
 
 ## Development setup
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Export SpotDownload playlists and tracks to a JSON file.
+Export CrateDigger playlists and tracks to a JSON file.
 Run from backend directory: python scripts/backup.py [output.json]
 """
 import json
@@ -57,7 +57,7 @@ try:
             for pl in playlists
         ],
     }
-    out_path = sys.argv[1] if len(sys.argv) > 1 else "spotdownload_backup.json"
+    out_path = sys.argv[1] if len(sys.argv) > 1 else "cratedigger_backup.json"
     with open(out_path, "w") as f:
         json.dump(out, f, indent=2)
     print(f"Exported {len(playlists)} playlists to {out_path}")

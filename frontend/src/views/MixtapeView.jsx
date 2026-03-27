@@ -132,8 +132,8 @@ export default function MixtapeView() {
   const currentSongsRef = useRef([]);
 
   useEffect(() => {
-    document.title = 'Mixtape ID — Music Studio';
-    return () => { document.title = 'Music Studio'; };
+    document.title = 'Mixtape ID — CrateDigger';
+    return () => { document.title = 'CrateDigger'; };
   }, []);
 
   const checkLastFile = useCallback(async () => {

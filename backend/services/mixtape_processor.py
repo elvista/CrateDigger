@@ -12,7 +12,7 @@ from services import audio_processor
 from services.audio_processor import cleanup_temp_file
 from services.fingerprinter import fingerprinter
 
-logger = logging.getLogger("spotdownload.mixtape_processor")
+logger = logging.getLogger("cratedigger.mixtape_processor")
 
 SAMPLE_INTERVAL = 15
 # ACRCloud recommends short clips (~15s) per request for reliable ID (we use MP3 segments).

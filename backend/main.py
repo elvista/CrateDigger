@@ -13,7 +13,7 @@ from routers import auth, downloads, export_import, mixtape, monitor, playlists
 from routers import settings as settings_router
 from services.monitor import MonitorService
 
-logger = logging.getLogger("spotdownload")
+logger = logging.getLogger("cratedigger")
 
 
 def _exception_handler(request: Request, exc: Exception) -> JSONResponse:
@@ -71,7 +71,7 @@ async def lifespan(app: FastAPI):
     await fingerprinter.aclose()
 
 
-app = FastAPI(title="SpotDownload", version="1.0.0", lifespan=lifespan)
+app = FastAPI(title="CrateDigger", version="1.0.0", lifespan=lifespan)
 
 app.add_exception_handler(Exception, _exception_handler)
 

@@ -1,1 +1,1 @@
-# Backend tests for SpotDownload
+# Backend tests for CrateDigger

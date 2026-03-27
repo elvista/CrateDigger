@@ -1,4 +1,4 @@
-"""SQLAlchemy engine, session factory, and base for SpotDownload models."""
+"""SQLAlchemy engine, session factory, and base for CrateDigger models."""
 
 from sqlalchemy import create_engine, event
 from sqlalchemy.orm import declarative_base, sessionmaker

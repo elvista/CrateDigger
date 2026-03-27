@@ -28,7 +28,7 @@ from services import audio_processor
 from services.fingerprinter import fingerprinter
 from services.mixtape_processor import process_audio_file_streaming
 
-logger = logging.getLogger("spotdownload.mixtape")
+logger = logging.getLogger("cratedigger.mixtape")
 
 BACKEND_ROOT = Path(__file__).resolve().parent.parent
 CACHE_DIR = BACKEND_ROOT / "cache"
@@ -536,7 +536,7 @@ async def spotify_callback(
     return HTMLResponse(
         content="""<!DOCTYPE html><html><head><meta charset="utf-8"><title>Spotify connected</title></head>
 <body style="font-family:system-ui;padding:2rem;">
-<p><strong>Spotify connected.</strong> You can close this tab and return to Music Studio, then click
+<p><strong>Spotify connected.</strong> You can close this tab and return to CrateDigger, then click
 <strong>Spotify Playlist</strong> again.</p>
 <script>setTimeout(function(){ window.close(); }, 800);</script>
 </body></html>"""

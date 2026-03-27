@@ -166,7 +166,7 @@ async def _post_download_workflow(
     """
     import logging
 
-    logger = logging.getLogger("spotdownload.downloads")
+    logger = logging.getLogger("cratedigger.downloads")
 
     try:
         # Get user tokens from DB

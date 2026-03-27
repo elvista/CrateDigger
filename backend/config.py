@@ -9,11 +9,11 @@ from pydantic_settings import BaseSettings
 
 load_dotenv(Path(__file__).resolve().parent.parent / ".env")
 
-DEFAULT_DOWNLOAD_PATH = str(Path.home() / "Music" / "SpotDownload")
+DEFAULT_DOWNLOAD_PATH = str(Path.home() / "Music" / "CrateDigger")
 
 
 class Settings(BaseSettings):
-    """Pydantic settings for SpotDownload (env and .env)."""
+    """Pydantic settings for CrateDigger (env and .env)."""
 
     SPOTIFY_CLIENT_ID: str = ""
     SPOTIFY_CLIENT_SECRET: str = ""
@@ -22,7 +22,7 @@ class Settings(BaseSettings):
     # Browser redirect after Spotify ID OAuth (Spotify does not validate this URI).
     FRONTEND_ORIGIN: str = "http://localhost:5173"
     DOWNLOAD_PATH: str = DEFAULT_DOWNLOAD_PATH
-    DATABASE_URL: str = "sqlite:///./spotdownload.db"
+    DATABASE_URL: str = "sqlite:///./cratedigger.db"
     MONITOR_INTERVAL_MINUTES: int = 30
     DOWNLOAD_CONCURRENCY: int = Field(default=3, ge=1, le=8)
     ENCRYPTION_KEY: str = ""  # Optional. If set, Spotify tokens are encrypted at rest.

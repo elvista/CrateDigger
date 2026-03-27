@@ -43,7 +43,7 @@ export default React.memo(function Layout({
                 </div>
                 <div className="flex flex-col min-w-0">
                   <span className="text-xl font-bold text-white tracking-tight leading-tight">
-                    Music <span className="text-spotify-green">Studio</span>
+                    Crate<span className="text-spotify-green">Digger</span>
                   </span>
                   <span className="text-[10px] uppercase tracking-wider text-spotify-light-gray/80 hidden sm:block">
                     Spotify ID · mixtapes

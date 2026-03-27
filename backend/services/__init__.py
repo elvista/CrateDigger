@@ -1,1 +1,1 @@
-"""Business logic services for SpotDownload."""
+"""Business logic services for CrateDigger."""

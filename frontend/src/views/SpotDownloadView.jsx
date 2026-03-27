@@ -75,7 +75,7 @@ export default function SpotDownloadView() {
   }, [loadPlaylists]);
 
   useEffect(() => {
-    document.title = 'Spotify ID — Music Studio';
+    document.title = 'Spotify ID — CrateDigger';
   }, []);
 
   useEffect(() => {

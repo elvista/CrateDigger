@@ -197,7 +197,7 @@ export default React.memo(function SettingsModal({ isOpen, onClose }) {
                 type="text"
                 value={downloadPath}
                 onChange={(e) => { setDownloadPath(e.target.value); setPathStatus(null); }}
-                placeholder="/Users/you/Music/SpotDownload"
+                placeholder="/Users/you/Music/CrateDigger"
                 className="flex-1 px-4 py-2.5 bg-spotify-mid-gray border border-white/10 rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:border-spotify-green focus:ring-1 focus:ring-spotify-green transition-all font-mono"
               />
               <button onClick={handleValidatePath} className="px-4 py-2.5 bg-spotify-mid-gray hover:bg-white/10 text-spotify-light-gray hover:text-white text-sm rounded-xl transition-all whitespace-nowrap border border-white/10" title="Validate path">

@@ -4,9 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Music Studio** is a self-hosted web app with two areas in one React shell:
+**CrateDigger** is a self-hosted web app with two areas in one React shell:
 
-1. **Spotify ID (SpotDownload)** — Monitors Spotify playlists and downloads new tracks (Python FastAPI, SQLite, SSE).
+1. **Spotify ID** — Monitors Spotify playlists and downloads new tracks (Python FastAPI, SQLite, SSE).
 2. **Mixtape ID** — Fingerprints long mixes (upload or YouTube / SoundCloud / Mixcloud) and builds a timestamped track list (FastAPI routes at `/api/mixtape`, ACRCloud / AudD, SSE).
 
 Single **FastAPI** backend on **:8000**, shared **repo-root `.env`**, Vite on **:5173** proxying **`/api` → FastAPI**.
@@ -70,9 +70,9 @@ pre-commit run --all-files   # Runs ruff (backend) + eslint (frontend)
 
 - **Entry**: `frontend/src/main.jsx` — `BrowserRouter`, `HeaderProvider`, `App`
 - **Routes** (`frontend/src/App.jsx`): `/` → `SpotDownloadView`, `/mixtape` → `MixtapeView`
-- **Layout**: `frontend/src/components/Layout.jsx` — **Music Studio** branding, nav **Spotify ID** / **Mixtape ID**, settings hidden on `/mixtape`
-- **Header go-home**: `frontend/src/context/HeaderContext.jsx` — playlist detail view registers “back” for the header
-- **API client**: `frontend/src/api/client.js` — SpotDownload REST
+- **Layout**: `frontend/src/components/Layout.jsx` — **CrateDigger** branding, nav **Spotify ID** / **Mixtape ID**, settings hidden on `/mixtape`
+- **Header go-home**: `frontend/src/context/HeaderContext.jsx` — playlist detail view registers "back" for the header
+- **API client**: `frontend/src/api/client.js` — CrateDigger REST
 - **SSE**: `hooks/useSSE.js` — download progress; Mixtape uses `EventSource` on `/api/mixtape/stream/:id` inside `MixtapeView`
 
 ### Vite dev proxy (`frontend/vite.config.js`)
@@ -109,7 +109,7 @@ Single **`.env` at the repository root** (see `.env.example`).
 
 Register **both** Spotify redirect URIs in the Spotify Developer Dashboard if you use Mixtape-only login; Settings-only users still need the main **`/api/auth/spotify/callback`** URI.
 
-**Spotify ID OAuth** (`routers/auth.py`): Authorization Code **with PKCE** (`code_challenge` / `code_verifier`); token exchange posts `client_id` and `code_verifier` only (no `client_secret` in that request, per Spotify’s PKCE tutorial).
+**Spotify ID OAuth** (`routers/auth.py`): Authorization Code **with PKCE** (`code_challenge` / `code_verifier`); token exchange posts `client_id` and `code_verifier` only (no `client_secret` in that request, per Spotify's PKCE tutorial).
 
 **Shared optional**
 
